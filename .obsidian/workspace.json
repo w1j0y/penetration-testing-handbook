@@ -1,0 +1,227 @@
+{
+  "main": {
+    "id": "c3a3fbce0315e6f5",
+    "type": "split",
+    "children": [
+      {
+        "id": "cfe91a9203af4c35",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "f8e339c708476f05",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Phase Two Exploitation/Attacking Common Services/-p 3306 MySQL.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "-p 3306 MySQL"
+            }
+          },
+          {
+            "id": "f1f4d9dbb9dd8a2d",
+            "type": "leaf",
+            "state": {
+              "type": "image",
+              "state": {
+                "file": "Pasted image 20250701200801.png"
+              },
+              "icon": "lucide-image",
+              "title": "Pasted image 20250701200801"
+            }
+          }
+        ],
+        "currentTab": 1
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "53404e22c4fff03b",
+    "type": "split",
+    "children": [
+      {
+        "id": "66b9e4327ccd27ec",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "388e42d2d73ac134",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
+            }
+          },
+          {
+            "id": "0f14c9db9197fa12",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "scp",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Search"
+            }
+          },
+          {
+            "id": "7994d0cf7e9237d0",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Bookmarks"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "3ed00875621d2f76",
+    "type": "split",
+    "children": [
+      {
+        "id": "f9fd5514480a2992",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "5da624492298783d",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Welcome.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Backlinks for Welcome"
+            }
+          },
+          {
+            "id": "417f7cae1e3ec417",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Welcome.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Outgoing links from Welcome"
+            }
+          },
+          {
+            "id": "013d784721ae030d",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Tags"
+            }
+          },
+          {
+            "id": "99fefd473477da84",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Welcome.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Outline of Welcome"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "daily-notes:Open today's daily note": false,
+      "templates:Insert template": false,
+      "command-palette:Open command palette": false
+    }
+  },
+  "active": "f1f4d9dbb9dd8a2d",
+  "lastOpenFiles": [
+    "Phase Two Exploitation/Web Exploitation/Other/File Inclusion.md",
+    "Pasted image 20250701200801.png",
+    "Pasted image 20250701200832.png",
+    "Useful Commands/ysoserial errors.md",
+    "Phase Two Exploitation/Attacking Common Services/-p 3306 MySQL.md",
+    "Post-Exploitation/Linux/Linux Privilege Escalation.md",
+    "Post-Exploitation/Linux/Linux File Transfers/Upload TO Linux Machine.md",
+    "Phase Two Exploitation/Attacking Common Services/-p 139,445 SMB.md",
+    "File Transfers/To transfer a brute force program to a server and execute from there.md",
+    "Phase One Information Gathering/Parameter Fuzzing.md",
+    "Phase One Information Gathering/Page Fuzzing.md",
+    "Phase Two Exploitation/Attacking Common Services/-p 111,2049 NFS.md",
+    "Phase Two Exploitation/Attacking Common Services/-p 21 FTP.md",
+    "Useful Commands/nostromo 1.9.6.md",
+    "Useful Commands/Webmin Login Page.md",
+    "Pasted image 20250701200810.png",
+    "Useful Commands/OpenNetAdmin.md",
+    "Useful Commands/Debug Mode Password.md",
+    "Useful Commands/MongoDB.md",
+    "AD notes/AD Recover deleted objects.md",
+    "Useful Commands/AD Recover deleted objects.md",
+    "Useful Commands/Open .sqlite files.md",
+    "Useful Commands/Decrypt Passwords.md",
+    "Useful Commands/dotnet executable.md",
+    "Useful Commands/VNC Passwords.md",
+    "Useful Commands/BLUDIT.md",
+    "Useful Commands/Adminer Service.md",
+    "Useful Commands/kdbx.md",
+    "Useful Commands/Hide reverse shell in an image.md",
+    "Useful Commands",
+    "Phase Two Exploitation/Web Exploitation/Other",
+    "Phase Two Exploitation/Web Exploitation/Web Service & API Attacks",
+    "Phase Two Exploitation/Web Exploitation/Session Attacks",
+    "Phase Two Exploitation/Web Exploitation/Server-side Attacks",
+    "Phase Two Exploitation/Web Exploitation/Broken Authentication",
+    "Phase Two Exploitation/Attacking Common Services",
+    "Phase Two Exploitation/Web Exploitation",
+    "Pasted image 20250629181504.png",
+    "Post-Exploitation/Windows/Windows Lateral Movement",
+    "Post-Exploitation/Windows/Windows Privilege Escalation/Attacking the OS"
+  ]
+}

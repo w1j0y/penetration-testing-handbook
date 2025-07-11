@@ -1,0 +1,1 @@
+https://medium.com/@mazalwebdesign/htb-academy-information-gathering-web-edition-module-skills-assessment-7c340e56eba7

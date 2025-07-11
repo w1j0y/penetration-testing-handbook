@@ -1,0 +1,5 @@
+For this we can utilize Burp Suite. We will intercept the payload from the site and replace it with `username[$ne]=toto&password[$ne]=toto`
+From [this blogpost](https://book.hacktricks.xyz/pentesting-web/nosql-injection) about NoSQL injection, we see that there is more to injection here than just login bypassing. We are actually able to extract user logins and even brute-force their passwords relatively easy.
+**[brute-force.py](http://brute-force.py)**
+[https://github.com/zackelia/hackthebox/blob/master/Machines/Mango/brute-force.py](https://github.com/zackelia/hackthebox/blob/master/Machines/Mango/brute-force.py)
+To do this, we will use their sample script to brute-force login usernames and passwords from POST login. We will have to add our own variables and obtain a sample session ID from Burp Suite.

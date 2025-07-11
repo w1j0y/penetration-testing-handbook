@@ -1,0 +1,6 @@
+```
+rustscan <ip>
+```
+```
+Masscan <ip>
+```
