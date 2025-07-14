@@ -11,8 +11,8 @@ These notes are updated regularly and are meant to serve as a quick reference an
 
 - [Active Directory Mindmap (PDF)](./AD%20notes/Active%20Directory.pdf) — A comprehensive mindmap covering enumeration, attacks, and common tools.  
   **Highly recommended for anyone studying or working with AD.**
-
-> *More detailed AD notes and walkthroughs will be added soon.*
+- [Active Directory Written Notes](./Active%20Directory/) — The mindmap is now fully expanded into organized, in-depth written notes and practical walkthroughs.  
+  **Browse individual topics and techniques in detail.**
 
 ---
 
