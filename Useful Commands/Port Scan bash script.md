@@ -1,0 +1,1 @@
+https://tecadmin.net/bash-script-to-scan-port-range/

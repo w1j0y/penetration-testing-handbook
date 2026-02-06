@@ -1,0 +1,1 @@
+[https://www.hackingarticles.in/shell-uploading-web-server-phpmyadmin/](https://www.hackingarticles.in/shell-uploading-web-server-phpmyadmin/)
