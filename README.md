@@ -5,7 +5,7 @@ It also includes practical tips and tricks from **IppSec’s YouTube videos** an
 
 These notes are updated regularly and are meant to serve as a quick reference and collection of actionable techniques for penetration testers.
 
-## Side project: Security Research Assistant
+## Side Project: Security Research Assistant
 
 **xLimit** - a security research assistant focused on offensive security workflows: https://xlimit.org/
 
