@@ -10,6 +10,12 @@ These notes are updated regularly and are meant to serve as a quick reference an
 Access these notes and much more through xLimit, your personal security assistant built for offensive security workflows.
 Try it free at https://xlimit.org/
 
+Built for guided security research, not blind automation.
+
+<img width="2559" height="951" alt="Screenshot 2026-04-15 091019" src="https://github.com/user-attachments/assets/b83967c5-595b-45c6-8ac2-a2c9a2082e7f" />
+<img width="2555" height="1190" alt="Screenshot 2026-04-15 091503" src="https://github.com/user-attachments/assets/730944ff-dd62-4f35-9e64-c0da6ff34cbb" />
+
+
 ---
 
 ## Active Directory
