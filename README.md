@@ -5,7 +5,7 @@ It also includes practical tips and tricks from **IppSec’s YouTube videos** an
 
 These notes are updated regularly and are meant to serve as a quick reference and collection of actionable techniques for penetration testers.
 
-Take it further with xLimit
+## Take it further with xLimit
 
 Access these notes and much more through xLimit, your personal security assistant built for offensive security workflows.
 Try it free at https://xlimit.org/
