@@ -25,9 +25,11 @@ Access the hosted xLimit assistant at:
 ### 2. Automatic In-Agent Retrieval *(Recommended)*
 
 The `xlimit-client` repository includes an **MCP server**.
-
 Register it once with tools such as **Claude Code** or **Codex**, and they can automatically call xLimit during active sessions to retrieve synthesized guidance — no copy-pasting required.
 
+For full setup instructions, see the [step-by-step deployment guide](https://blog.xlimit.org/how-to-deploy-and-use-xlimit-client.html).
+
+<img width="1157" height="132" alt="addxlimitmcp" src="https://github.com/user-attachments/assets/e2a89846-108a-4bc7-8ffe-274655e76402" />
 <img width="1157" height="132" alt="addxlimitmcp" src="https://github.com/user-attachments/assets/e2a89846-108a-4bc7-8ffe-274655e76402" />
 <img width="2548" height="937" alt="claude-prompt-01" src="https://github.com/user-attachments/assets/ac1e50ab-407a-4deb-abdd-b57b406d28c8" />
 <img width="2544" height="1140" alt="claude-prompt-02" src="https://github.com/user-attachments/assets/12e378fd-304a-410c-bff1-c6d3e802fcef" />
