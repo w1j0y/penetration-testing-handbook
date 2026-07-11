@@ -70,7 +70,7 @@ john --wordlist=rockyou.txt zip.hash
 ```
 ### Viewing the Cracked Hash
 ```
-d0x777@htb[/htb]$ john zip.hash --show
+w1j0y@htb[/htb]$ john zip.hash --show
 ```
 ## Cracking OpenSSL Encrypted Archives
 ### file GZIP.gzip

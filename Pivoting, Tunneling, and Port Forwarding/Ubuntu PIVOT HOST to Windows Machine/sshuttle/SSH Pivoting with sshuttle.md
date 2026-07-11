@@ -15,3 +15,12 @@ With this command, sshuttle creates an entry in our iptables to redirect all tra
 ```
 nmap -v -sV -p3389 172.16.5.19 -A -Pn
 ```
+### Using a Key Instead of a Password
+```
+sudo sshuttle -r ubuntu@10.129.202.64 --ssh-cmd "ssh -i ~/.ssh/id_rsa" 172.16.5.0/23 -v
+```
+### Routing More Than One Subnet at Once
+If the pivot host also reaches the DMZ segment, list both networks on the same command instead of running sshuttle twice.
+```
+sudo sshuttle -r ubuntu@10.129.202.64 172.16.5.0/23 172.16.8.0/24 -v
+```
