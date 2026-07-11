@@ -8,6 +8,11 @@ curl -I http://10.129.79.254 -H "Host: dev.inlanefreight.local"
 - `JAVA`: `JSESSION=<COOKIE_VALUE>`
 - `.NET`: `ASPSESSIONID<RANDOM>=<COOKIE_VALUE>`
 
+```
+curl -I http://10.129.79.254 -H "Host: dev.inlanefreight.local" | grep -iE "content-security-policy|strict-transport-security|x-frame-options"
+```
+Missing headers are a hardening gap worth noting, not a finding by itself.
+
 ## WhatWeb
 ```
 whatweb -a3 https://www.facebook.com -v

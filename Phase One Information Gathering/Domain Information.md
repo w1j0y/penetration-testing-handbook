@@ -22,7 +22,23 @@ for i in $(cat ip-addresses.txt);do shodan host $i;done
 dig any example.com
 ```
 
+## Netcraft / Tech Fingerprinting
+Netcraft (netcraft.com) is web-UI only for reliable results — no clean CLI equivalent.
+```
+curl -s "https://api.securitytrails.com/v1/domain/example.com/dns" -H "apikey: <API_KEY>" | jq
+```
+Alternative: builtwith.com (web UI, technology detection)
+
 ## whois
 ```
 whois <IP>
+```
+```
+whois example.com | grep -i "name server"
+```
+```
+whois example.com | grep -i "registrant"
+```
+```
+whois example.com | grep -i "expir"
 ```
