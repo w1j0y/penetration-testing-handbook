@@ -7,7 +7,7 @@ https://www.brunorochamoura.com/posts/cpts-report/
 
 ## Why reporting matters
 
-The exam is only passed when the report passes review. A technically correct attack chain with weak documentation will fail. Treat the report as a deliverable to a real client — because the grader reads it exactly that way.
+The exam is only passed when the report passes review. A technically correct attack chain with weak documentation will fail. Treat the report as a deliverable to a real client, because the grader reads it exactly that way.
 
 ---
 
@@ -33,14 +33,14 @@ Before touching anything:
 1. Create your report file in SysReptor (or your preferred tool).
 2. Fill in the cover page, contacts table, and scope table from the exam instructions.
 3. Paste the in-scope IP ranges / domains into the Scope section.
-4. Set the date range — start date is today.
+4. Set the date range: start date is today.
 5. Open the appendix tables (Host Discovery, Subdomain Discovery, Exploited Hosts, Compromised Users, Changes/Cleanup, Flags) so they are ready to receive data immediately.
 
 ---
 
 ## When you discover a host or service
 
-Add it to **Appendix A.2 — Host & Service Discovery** as soon as the port scan finishes.
+Add it to **Appendix A.2: Host & Service Discovery** as soon as the port scan finishes.
 
 | IP Address | Port | Service | Notes |
 |---|---|---|---|
@@ -55,22 +55,22 @@ Notes column: use it to record context you will need later ("Domain Controller f
 
 ## When you find a subdomain or virtual host
 
-Add it to **Appendix A.3 — Subdomain Discovery** immediately.
+Add it to **Appendix A.3: Subdomain Discovery** immediately.
 
 | URL | Description | Discovery Method |
 |---|---|---|
 | `<SUBDOMAIN>.<DOMAIN>` | Internal HR portal | DNS zone transfer |
 | `<VHOST>.<DOMAIN>` | Dev environment | Virtual host fuzzing (ffuf) |
 
-Record the discovery method — it matters for reproducibility.
+Record the discovery method: it matters for reproducibility.
 
 ---
 
 ## When you get foothold
 
-- Add the host to **Appendix A.4 — Exploited Hosts**.
+- Add the host to **Appendix A.4: Exploited Hosts**.
 - Screenshot the shell prompt showing `id` / `whoami` with hostname visible.
-- Note the vulnerability that gave access — use the finding title.
+- Note the vulnerability that gave access: use the finding title.
 
 | Host | Scope | Method | Notes |
 |---|---|---|---|
@@ -82,15 +82,15 @@ Record the discovery method — it matters for reproducibility.
 ## When you root a host
 
 - Screenshot `id` / `whoami` output, with hostname visible in the prompt.
-- Capture the flag — screenshot with the flag value visible (or redact for public).
-- Add the flag to **Appendix A.7 — Flags Discovered**.
-- Document any files you left behind in **Appendix A.6 — Changes/Cleanup**.
+- Capture the flag: screenshot with the flag value visible (or redact for public).
+- Add the flag to **Appendix A.7: Flags Discovered**.
+- Document any files you left behind in **Appendix A.6: Changes/Cleanup**.
 
 ---
 
 ## When you compromise a user
 
-Add to **Appendix A.5 — Compromised Users**.
+Add to **Appendix A.5: Compromised Users**.
 
 | Username | Type | Method | Notes |
 |---|---|---|---|
@@ -121,7 +121,7 @@ SysReptor field names are used below since most candidates use SysReptor.
 
 ### Title
 
-Clear, action-oriented. Include the location and mechanism — not just the vulnerability class.
+Clear, action-oriented. Include the location and mechanism, not just the vulnerability class.
 
 Good patterns:
 ```
@@ -137,13 +137,13 @@ Bad: `SQL Injection`, `Weak Permissions`, `RCE`
 
 ### CWE
 
-Single CWE number and name. Look it up on MITRE — do not guess.
+Single CWE number and name. Look it up on MITRE. Do not guess.
 
 Example: `CWE-434: Unrestricted Upload of File with Dangerous Type`
 
 ### CVSS
 
-CVSS 3.1 score and full vector string. Calculate it — do not estimate.
+CVSS 3.1 score and full vector string. Calculate it. Do not estimate.
 
 Example: `8.8 / CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H`
 
@@ -158,7 +158,7 @@ Example:
 
 ### Impact
 
-Bullet list. Worst consequence first. Stay specific to this finding — no boilerplate.
+Bullet list. Worst consequence first. Stay specific to this finding: no boilerplate.
 
 ```
 - Execute arbitrary commands on the server as <SERVICE_USER>
@@ -218,7 +218,7 @@ The output confirmed execution as <SERVICE_USER>:
     uid=33(www-data) gid=33(www-data) groups=33(www-data)
 ```
 
-Screenshots: place them immediately after the action that produced them. Crop to the relevant area. Do not add a separate caption block — the surrounding sentence explains what is shown.
+Screenshots: place them immediately after the action that produced them. Crop to the relevant area. Do not add a separate caption block: the surrounding sentence explains what is shown.
 
 A grader must be able to reproduce the finding from this section alone.
 
@@ -232,7 +232,7 @@ State this at the top: "The following walkthrough documents the shortest path to
 
 ### Short attack chain summary
 
-A numbered bullet list — one sentence per step, no images, no code blocks.
+A numbered bullet list: one sentence per step, no images, no code blocks.
 
 ```
 <CANDIDATE_NAME> ("the tester" herein) performed the following to fully compromise the <DOMAIN> domain:
@@ -250,7 +250,7 @@ A numbered bullet list — one sentence per step, no images, no code blocks.
 
 One section per host or logical phase. Structure per phase:
 
-1. Short intro paragraph — what the tester was trying to do.
+1. Short intro paragraph: what the tester was trying to do.
 2. Explain WHY each action was taken, not just what.
 3. Code block for every command.
 4. Screenshot after each key action.
@@ -274,14 +274,14 @@ For each finding and walkthrough step:
 - [ ] Screenshot placed after the action that produced it
 - [ ] Screenshot cropped to the relevant area only
 - [ ] Hostname or path visible in the shell prompt (confirms which host)
-- [ ] Proof of exploitability — not just "command ran" but what was accessible
+- [ ] Proof of exploitability: not just "command ran" but what was accessible
 - [ ] Sensitive values use `<PLACEHOLDER>` in the public version
 
 ---
 
 ## Cleanup / changes made
 
-**Appendix A.6 — Changes/Host Cleanup**
+**Appendix A.6: Changes/Host Cleanup**
 
 Document every artifact left on target systems, even if reverted.
 
@@ -291,15 +291,15 @@ Document every artifact left on target systems, even if reverted.
 | `<HOSTNAME>` | Internal | Created local user `<USERNAME>` for testing. Account deleted after session. |
 | `<HOSTNAME>` | Internal | Dropped `<TOOLNAME>` to `C:\Windows\Temp\`. File removed. MD5: `<HASH>` |
 
-Include MD5 for all uploaded files — the grader may check.
+Include MD5 for all uploaded files: the grader may check.
 
 ---
 
 ## Flags appendix
 
-**Appendix A.7 — Flags Discovered**
+**Appendix A.7: Flags Discovered**
 
-Sort ascending by flag number. Fill each entry as you capture the flag — do not reconstruct from memory.
+Sort ascending by flag number. Fill each entry as you capture the flag. Do not reconstruct from memory.
 
 | Flag # | Host | Flag Value | Flag Location | Method Used |
 |---|---|---|---|---|
@@ -310,7 +310,7 @@ Sort ascending by flag number. Fill each entry as you capture the flag — do no
 
 ## Domain password review
 
-Not included in the default SysReptor CPTS template — add it manually as an additional appendix after domain compromise.
+Not included in the default SysReptor CPTS template. Add it manually as an additional appendix after domain compromise.
 
 Include after obtaining NTDS.dit and cracking hashes. Typical statistics:
 
@@ -320,13 +320,13 @@ Include after obtaining NTDS.dit and cracking hashes. Typical statistics:
 - Most commonly reused passwords
 - Password length distribution
 
-Keep this section factual, no personal details — generalise any sensitive patterns.
+Keep this section factual, no personal details. Generalise any sensitive patterns.
 
 ---
 
 ## Executive summary
 
-Written for a non-technical reader — a senior manager who knows the business, not security.
+Written for a non-technical reader: a senior manager who knows the business, not security.
 
 Rules:
 - No tool names
@@ -338,7 +338,7 @@ Rules:
 
 **Approach** sub-section: state the testing methodology (Grey Box for CPTS: network ranges provided, no credentials, starting as an unauthenticated external user), date range, and non-evasive stance.
 
-**Assessment Overview**: grouped plain-language summary of findings. No finding names — describe categories and business impact. End with a recommendation to perform periodic assessments.
+**Assessment Overview**: grouped plain-language summary of findings. No finding names: describe categories and business impact. End with a recommendation to perform periodic assessments.
 
 ---
 
@@ -350,11 +350,11 @@ Three buckets for each finding:
 |---|---|---|---|
 | `<FINDING_NAME>` | Quick config change that removes immediate risk | Architectural fix | Process or program improvement |
 
-**Short term**: config changes, disabling a service, revoking a credential — something done in days.
+**Short term**: config changes, disabling a service, revoking a credential (something done in days).
 
-**Medium term**: code changes, policy updates, patching — something done in weeks.
+**Medium term**: code changes, policy updates, patching (something done in weeks).
 
-**Long term**: hardening programs, security training, monitoring maturity — something done over months.
+**Long term**: hardening programs, security training, monitoring maturity (something done over months).
 
 Do not put everything in Short Term. Distribute honestly.
 
@@ -362,15 +362,15 @@ Do not put everything in Short Term. Distribute honestly.
 
 ## Common mistakes
 
-- Filling appendices after the exam ends instead of during — leads to gaps and wrong order.
-- Putting off-path findings in the walkthrough — the walkthrough is for the attack chain only.
-- Skipping the bullet list summary — both layers of the walkthrough are required.
-- Writing the executive summary for a technical reader — it is for management, not the grader.
-- Inflating CVSS scores — calculate them, do not guess.
-- Grouping related vulnerabilities into one finding — each finding must be independently reproducible.
-- Writing the Root Cause section as if it is the Impact section — they are different things.
-- Forgetting the Domain Password Review appendix — it is not in the default template.
-- Leaving uploaded files undocumented in Changes/Cleanup — even deleted files must appear.
+- Filling appendices after the exam ends instead of during: leads to gaps and wrong order.
+- Putting off-path findings in the walkthrough. The walkthrough is for the attack chain only.
+- Skipping the bullet list summary: both layers of the walkthrough are required.
+- Writing the executive summary for a technical reader. It is for management, not the grader.
+- Inflating CVSS scores: calculate them, do not guess.
+- Grouping related vulnerabilities into one finding. Each finding must be independently reproducible.
+- Writing the Root Cause section as if it is the Impact section: they are different things.
+- Forgetting the Domain Password Review appendix. It is not in the default template.
+- Leaving uploaded files undocumented in Changes/Cleanup: even deleted files must appear.
 - Writing "I" instead of "the tester" in technical sections.
 
 ---

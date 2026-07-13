@@ -8,11 +8,11 @@ Note: These notes also apply well to CBBH-style web reporting. CWES is the curre
 
 Web application reports (CWES/CBBH) are scoped differently from infrastructure reports (CPTS):
 
-- No network enumeration appendices — no host discovery, no exploited hosts, no compromised users.
-- No internal network compromise walkthrough — findings speak for themselves.
+- No network enumeration appendices: no host discovery, no exploited hosts, no compromised users.
+- No internal network compromise walkthrough. Findings speak for themselves.
 - Appendix is flags only.
 - Executive summary uses grouped categories, not a finding-by-finding list.
-- Remediation is per-finding only — no separate Short/Medium/Long term summary section.
+- Remediation is per-finding only: no separate Short/Medium/Long term summary section.
 
 The result is a shorter, more focused document, but the finding quality standards are identical.
 
@@ -22,7 +22,7 @@ The result is a shorter, more focused document, but the finding quality standard
 
 Each finding must be independently reproducible from the Finding Evidence section alone.
 
-Think of yourself as writing a bug bounty report for a sophisticated program — clear, complete, no assumptions, reproduction from a clean state.
+Think of yourself as writing a bug bounty report for a sophisticated program: clear, complete, no assumptions, reproduction from a clean state.
 
 Write findings while you still have the application open and the request history in Burp. Reconstructing steps from memory hours later is how important details get lost.
 
@@ -57,7 +57,7 @@ These sections are static and take under 10 minutes. Having them ready removes f
 
 ### Title
 
-Include the full attack chain — not just the vulnerability class.
+Include the full attack chain, not just the vulnerability class.
 
 Good patterns:
 ```
@@ -74,7 +74,7 @@ The title should tell a grader what the impact is, not just the category.
 
 ### Severity / CVSS
 
-CVSS 3.1 score and full vector string. Calculate it — do not estimate.
+CVSS 3.1 score and full vector string. Calculate it. Do not estimate.
 
 Web findings that achieve RCE or auth bypass on real functionality tend to score Critical or High (8.0+). Score honestly.
 
@@ -84,7 +84,7 @@ Single CWE number and name from MITRE.
 
 ### Overview
 
-2–4 sentences. Explain why the vulnerability exists, then how it appears in this specific application. This is Root Cause — do not mix in impact or remediation here.
+2–4 sentences. Explain why the vulnerability exists, then how it appears in this specific application. This is Root Cause: do not mix in impact or remediation here.
 
 Example:
 > The application passes a user-supplied file path parameter directly to an include statement without sanitisation, allowing an attacker to include arbitrary files from the server filesystem. The `lang` parameter on `<URL>` is not restricted to an allowlist of valid values.
@@ -144,7 +144,7 @@ Bullet list of actionable steps. No product names. No code.
 A reproduction that skips steps will fail grader review. Rules:
 
 - Start from a clean browser session / clean Burp history.
-- Document every click, navigation, and request — even setup steps ("the tester logged in as `<USERNAME>` at `<URL>`").
+- Document every click, navigation, and request: even setup steps ("the tester logged in as `<USERNAME>` at `<URL>`").
 - Show exact tool commands with all flags.
 
 ```
@@ -171,7 +171,7 @@ Screenshot rules:
 - Crop to the relevant portion of the screen.
 - Do not include full Burp windows unless the full context is necessary.
 - Place the screenshot immediately after the step that produced it.
-- The surrounding sentence explains what the screenshot shows — no separate caption block.
+- The surrounding sentence explains what the screenshot shows. No separate caption block.
 
 **What to redact:**
 - Session tokens and cookies in screenshots (replace with `<SESSION_TOKEN>`)
@@ -195,7 +195,7 @@ Rules:
 - Name the specific data or capability at risk.
 - Avoid generic impact statements copy-pasted across findings.
 - Use conditional present: "allows an attacker to...", "can result in...".
-- Do not overclaim — only claim impact that you demonstrated.
+- Do not overclaim: only claim impact that you demonstrated.
 
 ---
 
@@ -224,7 +224,7 @@ Before submitting a finding:
 
 - Reproduce it from a clean browser session.
 - Confirm the behavior is consistent, not a one-time anomaly.
-- Verify the impact you claim is actually achievable — not just inferred from the vulnerability class.
+- Verify the impact you claim is actually achievable, not just inferred from the vulnerability class.
 - For injections: show extracted data, not just an error message change.
 - For auth bypass: show that protected content is actually accessible.
 
@@ -256,24 +256,24 @@ Evidence: tester changed user ID parameter from <OWN_ID> to <OTHER_ID> → respo
 ```
 Title: Remote Code Execution via Session Poisoning Exploited Through LFI in <PARAMETER>
 Evidence (two separate findings, independently documented):
-  Finding 1 — LFI: tester passed ../../../../etc/passwd → file contents returned
-  Finding 2 — RCE: tester poisoned PHP session via log injection → included session file → code executed
+  Finding 1 (LFI): tester passed ../../../../etc/passwd → file contents returned
+  Finding 2 (RCE): tester poisoned PHP session via log injection → included session file → code executed
 ```
 
 ---
 
 ## Common mistakes
 
-- Grouping related vulnerabilities into one finding — LFI and the follow-on RCE are two separate findings, each independently documentable.
+- Grouping related vulnerabilities into one finding: LFI and the follow-on RCE are two separate findings, each independently documentable.
 - Writing "I" instead of "the tester" in technical sections.
-- Skipping the out-of-scope list in the executive summary — graders expect it.
+- Skipping the out-of-scope list in the executive summary. Graders expect it.
 - Submitting scanner output as a finding without manual exploitation confirmation.
-- Missing the encoded form of a payload — show both decoded and encoded when encoding is relevant.
-- Cropping screenshots too aggressively — the URL and response code should still be visible in most cases.
+- Missing the encoded form of a payload: show both decoded and encoded when encoding is relevant.
+- Cropping screenshots too aggressively. The URL and response code should still be visible in most cases.
 - Leaving session tokens unredacted in screenshots.
-- Writing generic impact statements — tie impact to this specific application.
-- Adding a Remediation Summary section — CWES/CBBH reports do not have one; remediation is per-finding only.
-- Inflating CVSS scores — an information disclosure with no sensitive data in scope is not a 9.8.
+- Writing generic impact statements: tie impact to this specific application.
+- Adding a Remediation Summary section. CWES/CBBH reports do not have one; remediation is per-finding only.
+- Inflating CVSS scores: an information disclosure with no sensitive data in scope is not a 9.8.
 
 ---
 
@@ -286,7 +286,7 @@ Before submitting:
 - [ ] In-scope vulnerability types explicitly listed in the executive summary Approach section
 - [ ] Out-of-scope activities explicitly listed
 - [ ] Executive summary Assessment Overview groups findings by theme (not a finding-by-finding list)
-- [ ] Executive summary Impact paragraph uses business/risk language — no acronyms, no tool names
+- [ ] Executive summary Impact paragraph uses business/risk language: no acronyms, no tool names
 - [ ] Executive summary Recommended Remediations is a short bullet list
 - [ ] Each finding has: Title, CVSS, CWE, Overview (Root Cause), Impact, Affected Component, Reproduction Steps, Evidence, Recommendations, References
 - [ ] Each Finding Evidence section is reproducible from scratch, without reading any other section
@@ -296,5 +296,5 @@ Before submitting:
 - [ ] No out-of-scope findings submitted
 - [ ] No scanner-only output submitted without manual confirmation
 - [ ] Flags appendix complete (Flag #, Application URL, Flag Value, Flag Location, Method Used)
-- [ ] No remediation summary section — remediation is per-finding only
+- [ ] No remediation summary section: remediation is per-finding only
 - [ ] Third person ("the tester") used throughout technical sections

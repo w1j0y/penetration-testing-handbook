@@ -12,12 +12,12 @@ PS C:\htb> $Session = New-PSSession -ComputerName DATABASE01
 ```
 We can use the Copy-Item cmdlet to copy a file from our local machine DC01 to the DATABASE01 session we have $Session or vice versa.
 ### Copy samplefile.txt from our Localhost to the DATABASE01 Session
-#### Localhost —> DATABASE01
+#### Localhost -> DATABASE01
 ```
 PS C:\htb> Copy-Item -Path C:\samplefile.txt -ToSession $Session -Destination C:\Users\Administrator\Desktop\
 ```
 ### Copy DATABASE.txt from DATABASE01 Session to our Localhost
-#### DATABASE01 —> Localhost
+#### DATABASE01 -> Localhost
 ```
 PS C:\htb> Copy-Item -Path "C:\Users\Administrator\Desktop\DATABASE.txt" -Destination C:\ -FromSession $Session
 ```

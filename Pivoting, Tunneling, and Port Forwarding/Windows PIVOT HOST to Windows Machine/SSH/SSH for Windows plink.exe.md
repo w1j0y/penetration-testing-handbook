@@ -10,12 +10,12 @@ First run always stops to ask about the host key, which is a problem if this nee
 ```
 echo y | plink -ssh -D 9050 ubuntu@10.129.15.50
 ```
-Or skip the prompt and pass the password inline with -batch — useful if this is going into a scheduled task rather than run by hand:
+Or skip the prompt and pass the password inline with -batch, useful if this is going into a scheduled task rather than run by hand:
 ```
 plink -batch -ssh -D 9050 ubuntu@10.129.15.50 -pw "P@ssw0rd123"
 ```
-## Local Port Forward — Skipping the SOCKS Setup Entirely
-If we only need one specific port (RDP to the DC, say) the SOCKS proxy step isn't necessary at all — plink can forward it directly:
+## Local Port Forward: Skipping the SOCKS Setup Entirely
+If we only need one specific port (RDP to the DC, say) the SOCKS proxy step isn't necessary at all: plink can forward it directly:
 ```
 plink -ssh -L 127.0.0.1:3389:172.16.5.19:3389 ubuntu@10.129.15.50 -N
 ```

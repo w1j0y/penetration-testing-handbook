@@ -59,7 +59,7 @@ proxychains xfreerdp /v:172.16.5.19 /u:victor /p:pass@123
 ```
 **=> Windows Host reached through the Ubuntu Pivot Host (check mind map for more visual details)**
 # Chisel Port Forwarding (No SOCKS)
-Sometimes we don't need a full SOCKS proxy, just one specific port forwarded — RDP to the DC, say. Chisel does this without proxychains at all, since the forwarded port lands directly on our own loopback.
+Sometimes we don't need a full SOCKS proxy, just one specific port forwarded, RDP to the DC, say. Chisel does this without proxychains at all, since the forwarded port lands directly on our own loopback.
 ## Starting the Chisel Server on the Pivot Host
 ```
 ubuntu@WEB01:~$ ./chisel server -v -p 1234
@@ -73,7 +73,7 @@ w1j0y@htb[/htb]$ xfreerdp /v:127.0.0.1:3389 /u:victor /p:pass@123
 ```
 **=> RDP to the DC over our own local port, no proxychains needed**
 ## Reverse Port Forward
-If the pivot host can't accept inbound connections either, flip it the same way as the reverse SOCKS case above — server on our attack host, client on the pivot forwarding one of its own ports back to us.
+If the pivot host can't accept inbound connections either, flip it the same way as the reverse SOCKS case above: server on our attack host, client on the pivot forwarding one of its own ports back to us.
 ```
 w1j0y@htb[/htb]$ sudo ./chisel server --reverse -v -p 1234
 ```

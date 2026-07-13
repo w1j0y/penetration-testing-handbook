@@ -23,7 +23,7 @@ dig any example.com
 ```
 
 ## Netcraft / Tech Fingerprinting
-Netcraft (netcraft.com) is web-UI only for reliable results — no clean CLI equivalent.
+Netcraft (netcraft.com) is web-UI only for reliable results. No clean CLI equivalent.
 ```
 curl -s "https://api.securitytrails.com/v1/domain/example.com/dns" -H "apikey: <API_KEY>" | jq
 ```

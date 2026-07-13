@@ -87,18 +87,18 @@ socks4 127.0.0.1 9060
 ```
 proxychains nmap -sT 172.16.9.25
 ```
-# Alternative Method — SSH ProxyJump Chain
-All of the above assumes Meterpreter. If every hop in the chain actually has SSH (not just the first one), ProxyJump gets us the same three-hop reach without any of the payload/handler/autoroute juggling above — each hop just tunnels through the ones before it.
-## Hop 1 — SOCKS Through the First Pivot
+# Alternative Method: SSH ProxyJump Chain
+All of the above assumes Meterpreter. If every hop in the chain actually has SSH (not just the first one), ProxyJump gets us the same three-hop reach without any of the payload/handler/autoroute juggling above. Each hop just tunnels through the ones before it.
+## Hop 1: SOCKS Through the First Pivot
 ```
 ssh -D 9050 -N ubuntu@10.129.202.64
 ```
-## Hop 2 — Jump Through Hop 1 to Reach the Second Pivot
+## Hop 2: Jump Through Hop 1 to Reach the Second Pivot
 ```
 ssh -o ProxyJump=ubuntu@10.129.202.64 -D 9051 -N ubuntu@172.16.5.50
 ```
-## Hop 3 — Jump Through Both to Reach the Deepest Host
+## Hop 3: Jump Through Both to Reach the Deepest Host
 ```
 ssh -o ProxyJump=ubuntu@10.129.202.64,ubuntu@172.16.5.50 -D 9052 -N ubuntu@172.16.9.25
 ```
-Point proxychains at whichever hop's SOCKS port we actually need (9050/9051/9052) depending on how deep we're going — no autoroute, no socks_proxy module, just SSH chaining through hosts we already have credentials or keys for.
+Point proxychains at whichever hop's SOCKS port we actually need (9050/9051/9052) depending on how deep we're going. No autoroute, no socks_proxy module, just SSH chaining through hosts we already have credentials or keys for.
